@@ -27,6 +27,12 @@
             name="Latency Table"
             restorable="true">
       </view>
+      <view
+            class=""
+            id="org.eclipse.tracecompass.training.processing.statistics"
+            name="Latency Statistics"
+            restorable="true">
+      </view>
    </extension>
 
 </plugin>
