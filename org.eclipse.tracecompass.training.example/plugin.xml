@@ -19,4 +19,14 @@
          </tracetype>
       </module>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.eclipse.tracecompass.training.example.processing.views.ProcessingLatencyTableView"
+            id="org.eclipse.tracecompass.training.processing.table"
+            name="Latency Table"
+            restorable="true">
+      </view>
+   </extension>
+
 </plugin>
