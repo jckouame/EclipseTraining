@@ -34,7 +34,8 @@ public class ProcessingLatencyModule extends AbstractSegmentStoreAnalysisEventBa
 
     private static final Collection<ISegmentAspect> PROCESSING_ASPECTS = new ArrayList<>();
     static {
-        // TODO: Add Name aspect and Content aspect to PROCESSING_ASPECTS
+        PROCESSING_ASPECTS.add(ProcessingNameAspect.INSTANCE);
+        PROCESSING_ASPECTS.add(ProcessingContentAspect.INSTANCE);
     }
     private static final String PROCESSING_START = "ust_master:PROCESS_START";
     private static final String PROCESSING_END = "ust_master:PROCESS_END";
@@ -56,16 +57,26 @@ public class ProcessingLatencyModule extends AbstractSegmentStoreAnalysisEventBa
 
     @Override
     protected AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore) {
-        // TODO: - Create a new AbstractSegmentStoreAnalysisRequest and return it (instead of null)
-        //          - Override handleData
-        //              - Call processEvent
-        return null;
+        return new AbstractSegmentStoreAnalysisRequest(segmentStore) {
+            @Override
+            public void handleData(ITmfEvent event) {
+                super.handleData(event);
+                processEvent(event, segmentStore);
+            }
+        };
     }
 
     private void processEvent(ITmfEvent event, ISegmentStore<ISegment> segmentStore) {
-        // TODO: - If the event name is PROCESSING_START, add it do the ongoing segments
-        //       - otherwise, if the name is PROCESSING_END, check if there is a corresponding ProcessingInitialInfo in ongoing segments
-        //          - Add the segment
+        if (event.getName().equals(PROCESSING_START)) {
+            fOngoingProcessingSegments.put(new ProcessingInfoKey(event), new ProcessingInitialInfo(event));
+        } else if (event.getName().equals(PROCESSING_END)) {
+            ProcessingInfoKey key = new ProcessingInfoKey(event);
+            ProcessingInitialInfo processingInfo = fOngoingProcessingSegments.get(key);
+            if (processingInfo != null) {
+                long endTime = event.getTimestamp().getValue();
+                segmentStore.add(new ProcessingSegment(processingInfo.fStart, endTime, "PROCESSING", key.getSecond(), key.getFirst()));
+            }
+        }
     }
 
     @Override
@@ -75,7 +86,6 @@ public class ProcessingLatencyModule extends AbstractSegmentStoreAnalysisEventBa
 
     @Override
     public Iterable<ISegmentAspect> getSegmentAspects() {
-        // TODO: Return the aspects (instead of null)
-        return null;
+        return PROCESSING_ASPECTS;
     }
 }
