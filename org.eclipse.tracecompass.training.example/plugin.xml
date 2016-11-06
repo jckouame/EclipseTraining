@@ -28,7 +28,7 @@
             restorable="true">
       </view>
       <view
-            class=""
+            class="org.eclipse.tracecompass.training.example.processing.views.ProcessingLatencyStatisticsView"
             id="org.eclipse.tracecompass.training.processing.statistics"
             name="Latency Statistics"
             restorable="true">
